@@ -4,11 +4,15 @@ import { useNavigate } from "react-router-dom";
 import Input from "../Input";
 import "./styles.css";
 import Button from "../Button";
-import { createUserWithEmailAndPassword ,signInWithEmailAndPassword} from "firebase/auth";
-import { auth,db } from "../../firbase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import { auth, db, provider } from "../../firbase";
 import { toast } from "react-toastify";
-import {doc,setDoc,getDoc} from "firebase/firestore"   
-
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 function SignupSigninComponent() {
   const [name, setName] = useState("");
@@ -46,7 +50,7 @@ function SignupSigninComponent() {
             setPassword("");
             setConfirmPassword("");
             createDoc(user);
-            navigate("/dashboard"); 
+            navigate("/dashboard");
             // crreate doc wit user details in firestore
           })
           .catch((error) => {
@@ -71,26 +75,25 @@ function SignupSigninComponent() {
     setLoading(true);
     if (email !== "" && password !== "") {
       signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        toast.success("Login successful");
-        console.log("User logged in:", user);
-        setLoading(false);
-        navigate("/dashboard");
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        setLoading(false);
-        toast.error(errorMessage); 
-      });
-    }else{
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          toast.success("Login successful");
+          console.log("User logged in:", user);
+          setLoading(false);
+          navigate("/dashboard");
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setLoading(false);
+          toast.error(errorMessage);
+        });
+    } else {
       toast.error("Please fill all the fields");
       setLoading(false);
     }
-    
   }
 
   async function createDoc(user) {
@@ -98,31 +101,65 @@ function SignupSigninComponent() {
     //create document in firestore with user details
     setLoading(true);
 
+    if (!user) return;
 
-    if(!user) return;
-
-    const userRef = doc(db,"users",user.uid);
+    const userRef = doc(db, "users", user.uid);
     const userData = await getDoc(userRef);
-    
-    if(!userData.exists()){
+
+    if (!userData.exists()) {
       try {
-      await setDoc(doc(db,"users",user.uid), {
-        name: name,
-        email:user.email,
-        photoURL: user.photoURL? user.photoURL : "",
-        createdAt: new Date(),
-      });
-      toast.success("Doc created");
+        await setDoc(doc(db, "users", user.uid), {
+          name: user.displayName ? user.displayName : name,
+          email: user.email,
+          photoURL: user.photoURL ? user.photoURL : "",
+          createdAt: new Date(),
+        });
+        toast.success("Doc created");
+        setLoading(false);
+      } catch (e) {
+        toast.error(e.message);
+        setLoading(false);
+      }
+    } else {
+      // toast.error("Doc already exists");
       setLoading(false);
-    } catch(e){
+    }
+  }
+
+  // sign in using google and then redirect to dashboard
+  function googleAuth() {
+    // authentication logic here login user using google and then redirect to dashboard
+
+    setLoading(true);
+
+    try {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential.accessToken;
+          // The signed-in user info.
+          const user = result.user;
+          console.log("user>>>>", user);
+          createDoc(user);
+          setLoading(false);
+          navigate("/dashboard");
+          toast.success("User is authenticated with google!");
+          // IdP data available using getAdditionalUserInfo(result)
+          // ...
+        })
+        .catch((error) => {
+          // Handle Errors here.
+          setLoading(false);
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          toast.error(errorMessage);
+        });
+    } catch (e) {
+      setLoading(false);
       toast.error(e.message);
-      setLoading(false);
+      
     }
-    }else{
-      toast.error("Doc already exists");
-      setLoading(false);
-    }
-    
   }
 
   return (
@@ -157,7 +194,7 @@ function SignupSigninComponent() {
           <Button
             text="Login with google"
             blue={true}
-            onclick={() => alert("Login Successful with Google")}
+            onclick={googleAuth}
           />
           <p
             className="p-login"
@@ -208,11 +245,7 @@ function SignupSigninComponent() {
               onclick={signupWithEmail}
             />
             <p className="p-login">Or</p>
-            <Button
-              text="Sign Up with google"
-              blue
-              onclick={() => alert("Sign Up Successful with Google")}
-            />
+            <Button text="Sign Up with google" blue onclick={googleAuth} />
           </form>
           <p
             className="p-login"
