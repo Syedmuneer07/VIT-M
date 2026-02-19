@@ -11,6 +11,8 @@ import { auth, db } from "../firbase";
 import { addDoc, collection, getDocs, query } from "firebase/firestore";
 import { toast } from "react-toastify";
 import TransactionTable from "../components/TransactionsTable";
+import ChartComponent from "../components/Charts";
+import NoTransactions from "../components/NoTransaction";
 
 function Dashboard() {
   const [loading, setLoading] = useState(false);
@@ -79,10 +81,11 @@ function Dashboard() {
     let expenseTotal = 0;
 
     transactions.forEach((transaction)=>{
+      const amount = parseFloat(transaction.amount) || 0;
       if(transaction.type === "income"){
-        incomeTotal += transaction.amount;
+        incomeTotal += amount;
       }else{
-        expenseTotal += transaction.amount;
+        expenseTotal += amount;
       }
     })
     setIncome(incomeTotal);
@@ -107,7 +110,9 @@ function Dashboard() {
     setLoading(false);
   };
 
-  
+  let sortedTransactions = transactions.sort((a, b) => {
+    return new Date(a.date) - new Date(b.date);
+  });
 
   return (
     <div>
@@ -123,6 +128,7 @@ function Dashboard() {
             showExpenseModal={showExpenseModal}
             showIncomeModal={showIncomeModal}
           />
+          {transactions.length !== 0 ? <ChartComponent sortedTransactions={sortedTransactions}/> : <NoTransactions/>}
           <AddExpense
             isExpenseModalVisible={isExpenseModalVisible}
             handleExpenseCancel={handleExpenseCancel}
