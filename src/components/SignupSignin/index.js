@@ -141,7 +141,7 @@ function SignupSigninComponent() {
           const token = credential.accessToken;
           // The signed-in user info.
           const user = result.user;
-          console.log("user>>>>", user);
+          // console.log("user>>>>", user);
           createDoc(user);
           setLoading(false);
           navigate("/dashboard");
