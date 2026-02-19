@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -85,7 +86,7 @@ function SignupSigninComponent() {
           // ...
         })
         .catch((error) => {
-          // const errorCode = error.code;
+          const errorCode = error.code;
           const errorMessage = error.message;
           setLoading(false);
           toast.error(errorMessage);

@@ -1,6 +1,6 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import { Line, Pie } from "@ant-design/charts";
-import { color } from "chart.js/helpers";
 function ChartComponent({ sortedTransactions }) {
   const data = sortedTransactions.map((item) => {
     return { date: item.date, amount: item.amount };

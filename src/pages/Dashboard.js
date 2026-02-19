@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
 import Header from "../components/Header";
 import Cards from "../components/Cards";
@@ -113,33 +114,43 @@ function Dashboard() {
   });
 
   return (
-    <div>
+    <div className="dashboard-container">
       <Header />
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          <Cards
-            income={income}
-            expense={expense}
-            totalBalance={totalBalance}
-            showExpenseModal={showExpenseModal}
-            showIncomeModal={showIncomeModal}
-          />
-          {transactions.length !== 0 ? <ChartComponent sortedTransactions={sortedTransactions}/> : <NoTransactions/>}
-          <AddExpense
-            isExpenseModalVisible={isExpenseModalVisible}
-            handleExpenseCancel={handleExpenseCancel}
-            onFinish={onFinish}
-          />
-          <AddIncome
-            isIncomeModalVisible={isIncomeModalVisible}
-            handleIncomeCancel={handleIncomeCancel}
-            onFinish={onFinish}
-          />
-          <TransactionTable transactions={transactions} addTransaction={addTransaction} fetchTransactions={fetchTransactions}/>
-        </>
-      )}
+      <div className="dashboard-content">
+        {loading ? (
+          <div className="loading-container">
+            <p>Loading...</p>
+          </div>
+        ) : (
+          <>
+            <div className="cards-section">
+              <Cards
+                income={income}
+                expense={expense}
+                totalBalance={totalBalance}
+                showExpenseModal={showExpenseModal}
+                showIncomeModal={showIncomeModal}
+              />
+            </div>
+            <div className="charts-section">
+              {transactions.length !== 0 ? <ChartComponent sortedTransactions={sortedTransactions}/> : <NoTransactions/>}
+            </div>
+            <AddExpense
+              isExpenseModalVisible={isExpenseModalVisible}
+              handleExpenseCancel={handleExpenseCancel}
+              onFinish={onFinish}
+            />
+            <AddIncome
+              isIncomeModalVisible={isIncomeModalVisible}
+              handleIncomeCancel={handleIncomeCancel}
+              onFinish={onFinish}
+            />
+            <div className="transactions-section">
+              <TransactionTable transactions={transactions} addTransaction={addTransaction} fetchTransactions={fetchTransactions}/>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
