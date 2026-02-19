@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import Header from "../components/Header";
 import Cards from "../components/Cards";
-
-import { Modal } from "antd";
 import { useState } from "react";
 import AddExpense from "../components/Modals/addExpense";
 import AddIncome from "../components/Modals/addIncome";

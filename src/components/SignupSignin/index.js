@@ -85,7 +85,7 @@ function SignupSigninComponent() {
           // ...
         })
         .catch((error) => {
-          const errorCode = error.code;
+          // const errorCode = error.code;
           const errorMessage = error.message;
           setLoading(false);
           toast.error(errorMessage);
@@ -151,7 +151,7 @@ function SignupSigninComponent() {
         .catch((error) => {
           // Handle Errors here.
           setLoading(false);
-          const errorCode = error.code;
+          // const errorCode = error.code;
           const errorMessage = error.message;
           toast.error(errorMessage);
         });
